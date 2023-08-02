@@ -47,7 +47,7 @@ class DnsKeywordList implements AcqList {
             try {
                 await page.goto(url, {waitUntil: ["networkidle2"], timeout: 80000});
                 await page.waitForSelector('body > div.container.category-child > div > div.products-page__content > div.products-page__list > div.products-list > div > div > div > div.catalog-product__image > a > picture > img', {visible: true});
-                await page.waitForSelector('span.copy10 primary medium jsx-2889528833 normal      line-height-22', {timeout: 80000});
+                await page.waitForSelector('div.product-buy__price', {timeout: 80000});
                 await page.mouse.wheel({deltaY: 1000});
                 await page.mouse.wheel({deltaY: 1000});
                 await page.mouse.wheel({deltaY: 1000});

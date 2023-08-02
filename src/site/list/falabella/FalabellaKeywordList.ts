@@ -47,7 +47,7 @@ class DnsKeywordList implements AcqList {
             try {
                 await page.goto(url, {waitUntil: ["domcontentloaded"], timeout: 80000});
                 await page.waitForSelector('body > div > div > div > div.jsx-310365115 pod-group--container container > selection.jsx-310365115 pod-group--products > div > div.jsx-1221811815 search-results--products > div > div > div > div > a > picture > img', {visible: true});
-                await page.waitForSelector('div.product-buy__price', {timeout: 80000});
+                await page.waitForSelector('span.copy10.primary.medium.jsx-2889528833.normal', {timeout: 80000});
                 await page.mouse.wheel({deltaY: 1000});
                 await page.mouse.wheel({deltaY: 1000});
                 await page.mouse.wheel({deltaY: 1000});
@@ -60,7 +60,8 @@ class DnsKeywordList implements AcqList {
                 }
             }
             detailPage = cheerio.load(await page.content());
-            totalCnt = detailPage('span.copy5.secondary.jsx-2889529933.normal').text();
+            const spanText = await page.$eval('span#testId-SearchLandingContainer-totalResults', element => element.textContent);
+            totalCnt = spanText.match(/\((\d+)\)/);  // 괄호 안에 있는 숫자 추출
 
             //검색어 진입시 redirect되므로 현재 url로 요청보내야함
             if (category.categoryNameList.includes('LGEG')) {
@@ -79,12 +80,12 @@ class DnsKeywordList implements AcqList {
                 return coltBaseUrlList;
             }
 
-            let pageSize: number = 18;
+            let pageSize: number = 48;
             let pageCnt: number = Math.floor((totalCnt / pageSize));
             let mod: number = (totalCnt % pageSize);
             if (mod > 0) pageCnt = pageCnt + 1;
 
-            for (let pageNum = 1; pageNum <= 1; pageNum++) {
+            for (let pageNum = 1; pageNum <= pageCnt; pageNum++) {
                 if (pageNum > 1) {
                     try {
                         let urlUpdate = currentUrl + param + pageNum;
