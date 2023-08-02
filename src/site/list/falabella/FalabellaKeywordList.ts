@@ -13,8 +13,8 @@ let dateUtils = require('../../../util/DateUtil');
 const wait = require('../../../util/WaitUtil')
 const validate = require('../../../util/ValidatorUtil')
 
-const COLLECT_SITE: string = 'lg.dns-shop.ru'
-const SITE_NAME: string = 'DNS'
+const COLLECT_SITE: string = 'dynamic.falabella.cl'
+const SITE_NAME: string = 'FALABELLA_CL_DP'
 
 class DnsKeywordList implements AcqList {
 
@@ -40,14 +40,14 @@ class DnsKeywordList implements AcqList {
         let coltBaseUrlList: Array<ColtBaseUrlItem> = new Array();
         let detailPage: any
         let currentUrl: string = '';
-        let param: string = '?p=';
+        let param: string = '?page=';
         let totalCnt: number;
         try {
             let url: string = category.categoryUrl;
             try {
-                await page.goto(url, {waitUntil: ["networkidle2"], timeout: 80000});
-                await page.waitForSelector('body > div.container.category-child > div > div.products-page__content > div.products-page__list > div.products-list > div > div > div > div.catalog-product__image > a > picture > img', {visible: true});
-                await page.waitForSelector('span.copy10 primary medium jsx-2889528833 normal      line-height-22', {timeout: 80000});
+                await page.goto(url, {waitUntil: ["domcontentloaded"], timeout: 80000});
+                await page.waitForSelector('body > div > div > div > div.jsx-310365115 pod-group--container container > selection.jsx-310365115 pod-group--products > div > div.jsx-1221811815 search-results--products > div > div > div > div > a > picture > img', {visible: true});
+                await page.waitForSelector('div.product-buy__price', {timeout: 80000});
                 await page.mouse.wheel({deltaY: 1000});
                 await page.mouse.wheel({deltaY: 1000});
                 await page.mouse.wheel({deltaY: 1000});
@@ -60,6 +60,7 @@ class DnsKeywordList implements AcqList {
                 }
             }
             detailPage = cheerio.load(await page.content());
+            totalCnt = detailPage('span.copy5.secondary.jsx-2889529933.normal').text();
 
             //검색어 진입시 redirect되므로 현재 url로 요청보내야함
             if (category.categoryNameList.includes('LGEG')) {

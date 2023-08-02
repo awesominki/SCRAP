@@ -16,25 +16,19 @@ var args = [
     ,'--window-size=1920,1080'
 ]
 const proxyConfig = {
-    proxyName : 'oxyLab', //oxyLab, luminati 기본 셋팅은 oxyLab
-    username : 'epopcon',//
-    password : 'FChB5uEd45',// oxyLab
-
-    /*username: 'lum-customer-epopcon-zone-zone_ru',
-    password: 'jhwfsy8ucuh2',*/
-    key  : '4b33bfee-80a6-11eb-927e-901b0ec4424b', //oxylab
+   username: 'lum-customer-epopcon-zone-zone1',
+    password: 'epopconGuest1',
     contextUse : true
 }
 
 export const options = {
     args,
     proxyConfig,
-    headless: true,
+    headless: false,
     ignoreHTTPSErrors: true,
     defaultViewport: null,
     // executablePath: "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe", //for window
-    //executablePath: "/usr/bin/google-chrome-stable", //for deploy
 
     // userDataDir: '/Users/usr/git/wspider_node/puppet_profile/detail'
     // product: "chrome"

@@ -1,40 +1,4 @@
 {
-    "OXYLAB" : true,
-    "LUMINATI" : false,
-    "DETAIL_PUPPET_PROFILE" : "../../puppet_profile/detail",
-    "detail" : [
-        {
-            "COLLECT_SITE" : "lg.dns-shop.ru",
-            "CLASS_PATH" : "../site/detail/dns/DnsDetail"
-        },
-        {
-            "COLLECT_SITE" : "top.naverstore.com",
-            "CLASS_PATH" : "../site/detail/naver/NaverDetail"
-        },
-        {
-            "COLLECT_SITE" : "top.gsshop.com",
-            "CLASS_PATH" : "../site/detail/gsshop/GsshopDetail"
-        },
-        {
-            "COLLECT_SITE" : "lg.datart.cz",
-            "CLASS_PATH" : "../site/detail/datart/DatartDetail"
-        }
-
-    ],
-
-    "LIST_PUPPET_PROFILE" : "../../puppet_profile/detail",
-    "list" : [
-        {
-            "COLLECT_SITE" : "lg.dns-shop.ru",
-            "CLASS_PATH" : "../site/list/dns/DnsKeywordList"
-        }
-    ],
-
-    "CATEGORY_PUPPET_PROFILE" : "../../puppet_profile/detail",
-    "category" : [
-        {
-            "COLLECT_SITE" : "lg.dns-shop.ru",
-            "CLASS_PATH" : "../site/category/dns/DnsCategory"
-        }
-    ]
+  "LUMINATI": true,
+  "DETAIL_PUPPET_PROFILE": "../../puppet_profile/detail"
 }

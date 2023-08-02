@@ -1,0 +1,14 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 14
+    },
+    "auditLog": "logs\\.1c21438f0ff3ec1fbdf9bf463f7a73d979d04e2b-audit.json",
+    "files": [
+        {
+            "date": 1677755256218,
+            "name": "logs\\puppeteer-2023-03-02.log",
+            "hash": "b3fdb98d23125dea7aef3e1a34d550ee"
+        }
+    ]
+}
