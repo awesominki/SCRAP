@@ -16,7 +16,7 @@ const validate = require('../../../util/ValidatorUtil')
 const COLLECT_SITE: string = 'dynamic.falabella.cl'
 const SITE_NAME: string = 'FALABELLA_CL_DP'
 
-class DnsKeywordList implements AcqList {
+class FalabellaKeywordList implements AcqList {
 
     _glbConfig: { [key: string]: any; };
     collectSite: string;
@@ -39,14 +39,13 @@ class DnsKeywordList implements AcqList {
 
         let coltBaseUrlList: Array<ColtBaseUrlItem> = new Array();
         let detailPage: any
-        let currentUrl: string = '';
-        let param: string = '?page=';
+        let currentUrl: string = category.categoryUrl;
+        let param: string = '&page=';
         let totalCnt: number;
         try {
             let url: string = category.categoryUrl;
             try {
-                await page.goto(url, {waitUntil: ["domcontentloaded"], timeout: 80000});
-                await page.waitForSelector('body > div > div > div > div.jsx-310365115 pod-group--container container > selection.jsx-310365115 pod-group--products > div > div.jsx-1221811815 search-results--products > div > div > div > div > a > picture > img', {visible: true});
+                await page.goto(url, {waitUntil: ["networkidle2"], timeout: 80000});
                 await page.waitForSelector('span.copy10.primary.medium.jsx-2889528833.normal', {timeout: 80000});
                 await page.mouse.wheel({deltaY: 1000});
                 await page.mouse.wheel({deltaY: 1000});
@@ -61,17 +60,23 @@ class DnsKeywordList implements AcqList {
             }
             detailPage = cheerio.load(await page.content());
             const spanText = await page.$eval('span#testId-SearchLandingContainer-totalResults', element => element.textContent);
-            totalCnt = spanText.match(/\((\d+)\)/);  // 괄호 안에 있는 숫자 추출
+            const match = spanText.match(/\((\d+)\)/);  // 괄호 안에 있는 숫자 추출
+            if (match && match[1]) {
+                totalCnt = match[1];
+                console.log('Extracted number:', totalCnt);
+            } else {
+                console.log('Number not found in text.');
+            }
 
             //검색어 진입시 redirect되므로 현재 url로 요청보내야함
-            if (category.categoryNameList.includes('LGEG')) {
-                currentUrl = await page.url();
-                if (currentUrl.includes('?')) param = '&p=';
-                totalCnt = detailPage('span.products-count')//.text().replaceAll(/\d+ категориях/gm, '').replaceAll(/\d+ категории/gm, '').replaceAll(/\D+/gm, '');
-            } else {
-                totalCnt = detailPage('div.products-page__title').text().replaceAll(/\d+ категориях/gm, '').replaceAll(/\d+ категории/gm, '').replaceAll(/\D+/gm, '');
-                currentUrl = category.categoryUrl;
-            }
+            // if (category.categoryNameList.includes('LGEG')) {
+            //     currentUrl = await page.url();
+            //     if (currentUrl.includes('?')) param = '&p=';
+            //     totalCnt = detailPage('span.products-count')//.text().replaceAll(/\d+ категориях/gm, '').replaceAll(/\d+ категории/gm, '').replaceAll(/\D+/gm, '');
+            // } else {
+            //     totalCnt = detailPage('div.products-page__title').text().replaceAll(/\d+ категориях/gm, '').replaceAll(/\d+ категории/gm, '').replaceAll(/\D+/gm, '');
+            //     currentUrl = category.categoryUrl;
+            // }
 
             totalCnt = totalCnt > 2000 ? 2000 : totalCnt;
             logger.info('#Category: ' + category.categoryNameList + ', List Total Count: ' + totalCnt);
@@ -89,9 +94,10 @@ class DnsKeywordList implements AcqList {
                 if (pageNum > 1) {
                     try {
                         let urlUpdate = currentUrl + param + pageNum;
+                        console.log("urlUpdate : " + urlUpdate)
                         await page.goto(urlUpdate, {waitUntil: "networkidle2"}, {timeout: 30000})
-                        await page.waitForSelector('body > div.container.category-child > div > div.products-page__content > div.products-page__list > div.products-list > div > div > div > div.catalog-product__image > a > picture > img', {visible: true}, {timeout: 15000})
-                        await page.waitForSelector('div.product-buy__price', {timeout: 15000});
+                        //await page.waitForSelector('body > div > div > div > div.jsx-310365115 pod-group--container container > selection.jsx-310365115 pod-group--products > div > div.jsx-1221811815 search-results--products > div > div > div > div > a > picture > img', {visible: true}, {timeout: 15000})
+                        await page.waitForSelector('span.copy10.primary.medium.jsx-2889528833.normal', {timeout: 15000});
 
                         await page.mouse.wheel({deltaY: 1000});
                         await page.mouse.wheel({deltaY: 1000});
@@ -130,26 +136,24 @@ class DnsKeywordList implements AcqList {
 async function parsingItemList(categoryList: Array<string>, detailPage: any, pageNum: number, coltBaseUrlList: Array<ColtBaseUrlItem>): Promise<void> {
     let rank: number = coltBaseUrlList.length + 1;
 
-    detailPage('div.products-page__content > div.products-page__list  div.catalog-product.ui-button-widget').each((index: number, content: any) => {
+    detailPage('div.jsx-1221811815 search-results--products > div.jsx-1833870204 jsx-3831830274 pod pod-4_GRID').each((index: number, content: any) => {
         let bsItem: ColtBaseUrlItem = new ColtBaseUrlItem(new ColtShelfItem());
         let bsCate: ColtBaseUrlCate = new ColtBaseUrlCate();
         let bsRank: ColtBaseUrlRank = new ColtBaseUrlRank();
         let parentDiv: any = detailPage(content);
-        let url: string = 'https://www.dns-shop.ru' + parentDiv.find('div > a ').attr('href');
-        let goodsName: string = parentDiv.find('div > a > span').text();
-        let thumbnail: string = parentDiv.find('div.catalog-product__image > a > picture > img').attr('src');
+        let url: string = parentDiv.find('div > div > a ').attr('href');
+        let goodsName: string = parentDiv.find('div > a > span > b').text();
+        let thumbnail: string = parentDiv.find('div > div > a > picture > img').attr('src');
         if (validate.isNotUndefinedOrEmpty(thumbnail)) {
             thumbnail = '';
         }
-        let priceDiv: any = parentDiv.find('div.product-buy__price').text().replaceAll(/\s+/gm, '');
-        let priceInfo: Array<any> = priceDiv.split('₽')
-        let orgPrice: number = Math.max(priceInfo[0], priceInfo[1]);
-        let disPrice: number = Math.min(priceInfo[0], priceInfo[1]);
+        let disPrice: number = parentDiv.find('span.copy10 primary medium jsx-2889528833 normal').text().replaceAll(/\s+/gm, "").replaceAll("$","").replace(".","");
+        let orgPrice: number = parentDiv.find('span.copy3 primary medium jsx-2889528833 normal').text().replaceAll(/\s+/gm, "").replaceAll("$","").replace(".","");
         if (Object.is(orgPrice, NaN)) orgPrice = 0;
         if (Object.is(disPrice, NaN)) disPrice = 0;
 
-        let avgPoint: string = parentDiv.find('div.catalog-product__stat > a.catalog-product__rating').attr('data-rating');
-        let totalEvalutCnt: string = parentDiv.find('div.catalog-product__stat > a.catalog-product__rating').text();
+        let avgPoint: string = parentDiv.find('div.jsx-1833870204 jsx-3831830274 pod-rating rating-rebranding pod-rating-4_GRID > div.jsx-1900341405 ratings').attr('data-rating');
+        let totalEvalutCnt: string = parentDiv.find('div.jsx-1833870204 jsx-3831830274 pod-rating rating-rebranding pod-rating-4_GRID > span.jsx-2146889120 reviewCount reviewCount-4_GRID').text().replaceAll("(","").replaceAll(")","");
         if (totalEvalutCnt.includes('k')) {
             totalEvalutCnt = totalEvalutCnt.replaceAll(/\D+/gm, '');
             totalEvalutCnt = totalEvalutCnt + '000';
@@ -173,4 +177,4 @@ async function parsingItemList(categoryList: Array<string>, detailPage: any, pag
     });
 }
 
-export {DnsKeywordList};
+export {FalabellaKeywordList};

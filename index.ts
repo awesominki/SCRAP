@@ -1,6 +1,7 @@
 import {DnsCategory} from "./src/site/category/dns/DnsCategory";
 import {DnsDetail} from "./src/site/detail/dns/DnsDetail";
 import {options as chromeConfig} from "./src/config/chrome/ChromeConfig";
+import {FalabellaKeywordList} from "./src/site/list/falabella/FalabellaKeywordList";
 import {DnsKeywordList} from "./src/site/list/dns/DnsKeywordList";
 
 async function launch(){
@@ -14,15 +15,15 @@ async function launch(){
 */
 
      // list용 실행
-/*     category['categoryNameList'] = ["DNS", "ТВ и мультимедиа", "Телевизоры и аксессуары" ,"Телевизоры"]
-     category['categoryUrl'] = "https://www.dns-shop.ru/catalog/17a8ae4916404e77/televizory/"
+     category['categoryNameList'] = ["DNS", "ТВ и мультимедиа", "Телевизоры и аксессуары" ,"Телевизоры"]
+     category['categoryUrl'] = "https://www.falabella.com/falabella-cl/search?Ntt=oled77"
      category['categoryNameList'] = category['categoryNameList'].join( " > ")
-     const item = await new DnsKeywordList(chromeConfig,'lg.dns-shop.ru').getItemUrls(category)*/
+     const item = await new FalabellaKeywordList(chromeConfig,'dynamic.falabella.cl').getItemUrls(category)
 
 
     // detail용 실행
-    const item = await new DnsDetail(chromeConfig,'lg.dns-shop.ru')
-        .extractItemDetail("https://www.dns-shop.ru/product/232ec529f8212ff2/fen-enchen-air-hair-dryer-basic-version-belyj")
+    // const item = await new DnsDetail(chromeConfig,'lg.dns-shop.ru')
+    //     .extractItemDetail("https://www.dns-shop.ru/product/232ec529f8212ff2/fen-enchen-air-hair-dryer-basic-version-belyj")
 
 
     console.log(item)
