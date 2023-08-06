@@ -14,6 +14,16 @@
             "date": 1691045193289,
             "name": "logs\\puppeteer-2023-08-03.log",
             "hash": "58ee2ce518ef04a5e047e530a93ddb4e"
+        },
+        {
+            "date": 1691212173548,
+            "name": "logs\\puppeteer-2023-08-05.log",
+            "hash": "3652def72367c7aed99ce4e77ea8454c"
+        },
+        {
+            "date": 1691306684982,
+            "name": "logs\\puppeteer-2023-08-06.log",
+            "hash": "365872c59bc2d47a2cfd91c735fa04cf"
         }
     ]
 }

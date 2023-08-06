@@ -1,8 +1,9 @@
 import {DnsCategory} from "./src/site/category/dns/DnsCategory";
 import {DnsDetail} from "./src/site/detail/dns/DnsDetail";
 import {options as chromeConfig} from "./src/config/chrome/ChromeConfig";
+import {FalabellaDetail} from "./src/site/detail/falabella/FalabellaDetail";
 import {FalabellaKeywordList} from "./src/site/list/falabella/FalabellaKeywordList";
-import {DnsKeywordList} from "./src/site/list/dns/DnsKeywordList";
+import {FalabellaLGKeywordList} from "./src/site/list/falabella/FalabellaLGKeywordList";
 
 async function launch(){
     const category = {}
@@ -15,15 +16,15 @@ async function launch(){
 */
 
      // list용 실행
-     category['categoryNameList'] = ["DNS", "ТВ и мультимедиа", "Телевизоры и аксессуары" ,"Телевизоры"]
-     category['categoryUrl'] = "https://www.falabella.com/falabella-cl/search?Ntt=oled77"
-     category['categoryNameList'] = category['categoryNameList'].join( " > ")
-     const item = await new FalabellaKeywordList(chromeConfig,'dynamic.falabella.cl').getItemUrls(category)
+     // category['categoryNameList'] = ["DNS", "ТВ и мультимедиа", "Телевизоры и аксессуары" ,"Телевизоры"]
+     // category['categoryUrl'] = "https://www.falabella.com/falabella-cl/brand/LG"
+     // category['categoryNameList'] = category['categoryNameList'].join( " > ")
+     // const item = await new FalabellaLGKeywordList(chromeConfig,'dynamic.falabella.cl').getItemUrls(category)
 
 
     // detail용 실행
-    // const item = await new DnsDetail(chromeConfig,'lg.dns-shop.ru')
-    //     .extractItemDetail("https://www.dns-shop.ru/product/232ec529f8212ff2/fen-enchen-air-hair-dryer-basic-version-belyj")
+    const item = await new FalabellaDetail(chromeConfig,'dynamic.falabella.cl')
+        .extractItemDetail("https://www.falabella.com/falabella-cl/product/16149997/OLED-Philips-55-Android-Tv-4K-UHD/16149997")
 
 
     console.log(item)

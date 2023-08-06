@@ -16,7 +16,7 @@ const validate = require('../../../util/ValidatorUtil')
 const COLLECT_SITE: string = 'dynamic.falabella.cl'
 const SITE_NAME: string = 'FALABELLA_CL_DP'
 
-class FalabellaKeywordList implements AcqList {
+class FalabellaLGKeywordList implements AcqList {
 
     _glbConfig: { [key: string]: any; };
     collectSite: string;
@@ -40,7 +40,7 @@ class FalabellaKeywordList implements AcqList {
         let coltBaseUrlList: Array<ColtBaseUrlItem> = new Array();
         let detailPage: any
         let currentUrl: string = category.categoryUrl;
-        let param: string = '&page=';
+        let param: string = '?page=';
         let totalCnt: number;
         try {
             let url: string = category.categoryUrl;
@@ -64,7 +64,7 @@ class FalabellaKeywordList implements AcqList {
                 }
             }
             detailPage = cheerio.load(await page.content());
-            const spanText = await page.$eval('span#testId-SearchLandingContainer-totalResults', element => element.textContent);
+            const spanText = await page.$eval('span#testId-ProductLandingContainer-totalResults', element => element.textContent);
             const match = spanText.match(/\((\d+)\)/);  // 괄호 안에 있는 숫자 추출
             if (match && match[1]) {
                 totalCnt = match[1];
@@ -104,6 +104,8 @@ class FalabellaKeywordList implements AcqList {
                         //await page.waitForSelector('body > div > div > div > div.jsx-310365115 pod-group--container container > selection.jsx-310365115 pod-group--products > div > div.jsx-1221811815 search-results--products > div > div > div > div > a > picture > img', {visible: true}, {timeout: 15000})
                         await page.waitForSelector('span.copy10.primary.medium.jsx-2889528833.normal', {timeout: 15000});
 
+                        await page.mouse.wheel({deltaY: -1000});
+                        await page.mouse.wheel({deltaY: 1000});
                         await page.mouse.wheel({deltaY: 1000});
                         await page.mouse.wheel({deltaY: 1000});
                         await page.mouse.wheel({deltaY: 1000});
@@ -155,10 +157,10 @@ async function parsingItemList(categoryList: Array<string>, detailPage: any, pag
         let url: string = parentDiv.find('div > div > a ').attr('href');
         let goodsName: string = parentDiv.find('div > a > span > b.jsx-1833870204.copy2.primary.jsx-2889528833.normal').text();
         let thumbnail: string = parentDiv.find('div.jsx-1833870204.jsx-3831830274.pod-head > div > a > picture > img').attr('src');
+        console.log(thumbnail)
         // if (validate.isNotUndefinedOrEmpty(thumbnail)) {
         //     thumbnail = '';
         // }
-
         let disPrice: any = parentDiv.find('span.copy10.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$","");
         if(disPrice.length > 7) {
             disPrice = disPrice.replace(/\.(?=.*\.)/g, "");
@@ -182,8 +184,9 @@ async function parsingItemList(categoryList: Array<string>, detailPage: any, pag
                 orgPrice = orgPrice.replace(/\.(?=.*\.)/g, "");
             }
         }
-        if (Object.is(orgPrice, NaN)) orgPrice = '';
-        if (Object.is(disPrice, NaN)) disPrice = '';
+
+        if (Object.is(orgPrice, NaN)) orgPrice = 0;
+        if (Object.is(disPrice, NaN)) disPrice = 0;
 
         let avgPoint: string = parentDiv.find('div.jsx-1833870204.jsx-3831830274.pod-rating.rating-rebranding.pod-rating-4_GRID > div.jsx-1900341405.ratings').attr('data-rating');
         let totalEvalutCnt: string = parentDiv.find('div.jsx-1833870204.jsx-3831830274.pod-rating.rating-rebranding.pod-rating-4_GRID > span.jsx-2146889120.reviewCount.reviewCount-4_GRID').text().replaceAll("(","").replaceAll(")","");
@@ -210,4 +213,4 @@ async function parsingItemList(categoryList: Array<string>, detailPage: any, pag
     });
 }
 
-export {FalabellaKeywordList};
+export {FalabellaLGKeywordList};
