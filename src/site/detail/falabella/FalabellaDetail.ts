@@ -48,7 +48,7 @@ class FalabellaDetail implements AcqDetail {
                 const goodsName :string = detailPage('h1.jsx-1267102499.product-name.fa--product-name.false').text();
                 const itemNum :string = await this.getItemNum(url);
                 if (!await validator.isNotUndefinedOrEmpty(goodsName)) {
-                    await makeItem.makeNotFoundColtItem(cItem, url, this.collectSite, itemNum, detailPage, '17');
+                    await makeItem.makeNotFoundColtItem(cItem, url, this.collectSite, itemNum, detailPage, '97');
                     return cItem;
                 }
                 logger.info('itemNum: ' + itemNum + ' TITLE:' + goodsName);
@@ -61,21 +61,35 @@ class FalabellaDetail implements AcqDetail {
                 }
 
                 // product_code -> 제품의 모델넘머로 addInfo에 추가해주면 좋음
-                const product_code :string = detailPage('div.product-card-top__code').text().replaceAll(/\D+/gm, '');
-                let brand_name :string = detailPage('a.product-card-top__brand > img').attr('alt');
-                let avgPoint :number = detailPage('div.product-card-top__stat > a.product-card-top__rating').attr('data-rating') //as unknown as number;
+                const product_code :string = detailPage('span.jsx-3410277752').text().replaceAll(/\D+/gm, '');
+                let brand_name :string = detailPage('a.jsx-1874573512.product-brand-link').text();
+                let avgPoint :number = detailPage('div.bv_avgRating_component_container.notranslate').text(); //as unknown as number;
                 if (!await validator.isNotUndefinedOrEmpty(avgPoint)) avgPoint = 0;
                 let totalEvalutCnt :number= await this.getTotalEvalutCnt(detailPage) // as unknown as number;
                 let addInfo :string = await this.getAddInfo(detailPage, product_code);
 
 
                 //--price--
-                let priceDiv :any = detailPage('div.product-card-top.product-card-top_full > div.product-card-top__buy > div.product-buy.product-buy_one-line > div >div.product-buy__price').text().replaceAll(/\s/gm, '');
-                let priceInfo :Array<number> = priceDiv.split('₽');
-                let orgPrice :number = Math.max(priceInfo[0], priceInfo[1]);
-                let disPrice :number = Math.min(priceInfo[0], priceInfo[1]);
-                if (Object.is(orgPrice, NaN)) orgPrice = 0;
-                if (Object.is(disPrice, NaN)) disPrice = 0;
+                let orgPrice :any = '';
+                let disPrice :any = 0;
+                if (detailPage('span.copy17.primary.senary.jsx-1164622985').text() !== ''){
+                    orgPrice = detailPage('span.copy17.primary.senary.jsx-1164622985').text().replaceAll(/\s+/gm, "").replaceAll("$","");
+                }else{
+                    let priceDiv : any = detailPage('ol.jsx-749763969.ol-4_GRID.pdp-prices.fa--prices.li-separation');
+                    if(priceDiv.find('li.jsx-749763969.prices-2').attr('data-normal-price') !== ''){
+                        orgPrice = priceDiv.find('li.jsx-749763969.prices-2').attr('data-normal-price').replaceAll(/\s+/gm, "").replaceAll("$","");
+                        disPrice = priceDiv.find('li.jsx-749763969.prices-1').attr('data-internet-price').replaceAll(/\s+/gm, "").replaceAll("$","");
+                    }else{
+                        orgPrice = priceDiv.find('li.jsx-749763969.prices-1').attr('data-normal-price').replaceAll(/\s+/gm, "").replaceAll("$","");
+                        disPrice = priceDiv.find('li.jsx-749763969.prices-0').attr('data-internet-price').replaceAll(/\s+/gm, "").replaceAll("$","");
+                    }
+                }
+                if(orgPrice.length > 7) {
+                    orgPrice = orgPrice.replace(/\.(?=.*\.)/g, "");
+                }
+                if(disPrice.length > 7) {
+                    disPrice = disPrice.replace(/\.(?=.*\.)/g, "");
+                }
                 let ivtAddPrice :number = orgPrice;
 
                 // 할인가가 따로 존재할 때
@@ -89,28 +103,28 @@ class FalabellaDetail implements AcqDetail {
                 }
 
                 // makeColtItem생성
-                await makeItem.makeColtItem(cItem, url, this.collectSite, 'Dns', '017', goodsName, itemNum, goodsCate,
+                await makeItem.makeColtItem(cItem, url, this.collectSite, 'Falabella', '017', goodsName, itemNum, goodsCate,
                     brand_name, avgPoint, totalEvalutCnt, addInfo, orgPrice, disPrice);
 
                 //--option--
                 // item이 해당하는 옵션들을 가져옴
-                let optionList :Array<string> = await this.getOptionInfo(detailPage);
+                let optionList :Array<string> = await this.getOptionInfo(detailPage,page);
 
                 //--image and video--
                 // 비디오와 이미지 url을 가져옴
-                let imageList :Array<string> = [];
-                try {
-                    imageList = await this.getImageAndVideoInfo(detailPage, context);
-                } catch (error) {
-                    console.log('getImageAndVideoInfo Fail');
-                }
-                // 가져온 미디어 url들을 coltImage 데이터로 만들어서 cItem에 추가한다
-                imageList.map((image) => {
-                    const coltImage :ColtImage = new ColtImage();
-                    coltImage.goodsImage = image;
-                    coltImage.hash = hash.toHash(image);
-                    cItem.coltImageList.push(coltImage);
-                });
+                // let imageList :Array<string> = [];
+                // try {
+                //     imageList = await this.getImageAndVideoInfo(detailPage, context);
+                // } catch (error) {
+                //     console.log('getImageAndVideoInfo Fail');
+                // }
+                // // 가져온 미디어 url들을 coltImage 데이터로 만들어서 cItem에 추가한다
+                // imageList.map((image) => {
+                //     const coltImage :ColtImage = new ColtImage();
+                //     coltImage.goodsImage = image;
+                //     coltImage.hash = hash.toHash(image);
+                //     cItem.coltImageList.push(coltImage);
+                // });
 
                 // 재고 정보 추가
                 await this.getStockInfo(cItem, page, detailPage, url, optionList, product_code, ivtAddPrice);
@@ -262,58 +276,66 @@ class FalabellaDetail implements AcqDetail {
         return imageList;
     }
 
-    async getOptionInfo(detailPage :any) :Promise<string[]> {
+    async getOptionInfo(detailPage :any, page) :Promise<string[]> {
         let optionList :Array<string> = [];
-        detailPage('div.multicard.product-card-top__multi >div.multicard__param').each((index : number, el : any) => {
-            let optionDiv :any = detailPage(el);
-            let title :string = optionDiv.find('> div.multicard__param-title').text().replaceAll(/\s+/gm, '');  // ex) 색상, size
-            let label :string = '';     // ex) 파란색, L
-            let input = optionDiv.find('> div.multicard__values > input');
-            input.each((index : number, el : any) => {
-                if (el.attribs.checked !== undefined) {     // 선택된 옵션을 찾음
-                    label = optionDiv.find('> div.multicard__values > label').eq(index).text();
-                }
+        let colorTitle :string = detailPage('span.copy3.primary.jsx-1164622985').text().replaceAll(/\s+/gm, '');
+        let sizeTitle :string = detailPage('span.jsx-592930973.size-title').text();
+        const colorOptionSelector = 'span.copy3.primary.jsx-1164622985.normal';  // 색상 옵션 리스트의 선택자로 변경
+
+        await page.evaluate((colorOptionSelector) => {
+            const colorElements = document.querySelectorAll(colorOptionSelector);
+
+            colorElements.forEach((colorElement) => {
+                // 색상을 클릭하여 이름이 바뀌는 동작 시뮬레이션
+                colorElement.click();
+
+                // 색상 이름 추출 및 배열에 추가
+                const colorName = colorElement.textContent.trim();
+                optionList.push(colorTitle + colorName);
             });
-            optionList.push(title + label);
-        });
+            colorElements.forEach((colorElement) => {
+                colorElement.click();  // 색상을 클릭하여 이름이 바뀌는 동작 시뮬레이션
+
+                const sizeButtonElements = document.querySelectorAll('div.jsx-592930973.size-options > button');  // 사이즈 버튼 선택자로 변경
+
+                sizeButtonElements.forEach((sizeButtonElement) => {
+                    const size = sizeButtonElement.textContent.trim();
+                    optionList.push(sizeTitle + size);
+                });
+            });
+        }, colorOptionSelector);
+
         return optionList;
     }
 
     async getTotalEvalutCnt(detailPage :any) :Promise<number> {
-        let totalEvalutCnt :string = detailPage('div.product-card-top__stat > a.product-card-top__rating').text();
-        if (totalEvalutCnt.includes('k')) {
-            totalEvalutCnt = totalEvalutCnt.replaceAll(/\D+/gm, '');
-            totalEvalutCnt = totalEvalutCnt + '000';
-        } else if (totalEvalutCnt.includes('нет отзывов')) {
-            totalEvalutCnt = totalEvalutCnt.replaceAll(/\D+/gm, '0');
+        let totalEvalutCnt :string = detailPage('div.bv_numReviews_component_container > a.bv_numReviews_text').text();
+        const regex = /\((\d+)\)/; // (숫자) 패턴을 찾는 정규식
+        const match = regex.exec(totalEvalutCnt); // 정규식을 문자열에 적용하여 매치 찾기
+        let extractedNumber :any = "";
+        if (match && match[1]) {
+            extractedNumber = match[1]; // 첫 번째 그룹에서 추출한 숫자
+            console.log('Extracted Number:', extractedNumber);
+        } else {
+            console.log('Number not found.');
         }
-        return totalEvalutCnt as unknown as number;
+        return extractedNumber as unknown as number;
     }
 
     async getAddInfo(detailPage :any, product_code :string) {
         var addinfoObj :Object = new Object();
         addinfoObj['Product code'] = product_code;
-        let service_rating :string = detailPage('div.product-card-top__stat > a.product-card-top__service-rating').text().replaceAll(/,/gm, '.');
-        let service_comment :string = detailPage('div.product-card-top__stat > a.product-card-top__comments').text().trim();
-        if (await validator.isNotUndefinedOrEmpty(service_comment)) addinfoObj['Communicator'] = service_comment;
-        if (await validator.isNotUndefinedOrEmpty(service_rating)) addinfoObj['Reliability assessment'] = service_rating;
+        // let service_rating :string = detailPage('div.product-card-top__stat > a.product-card-top__service-rating').text().replaceAll(/,/gm, '.');
+        // let service_comment :string = detailPage('div.product-card-top__stat > a.product-card-top__comments').text().trim();
+        // if (await validator.isNotUndefinedOrEmpty(service_comment)) addinfoObj['Communicator'] = service_comment;
+        // if (await validator.isNotUndefinedOrEmpty(service_rating)) addinfoObj['Reliability assessment'] = service_rating;
 
 
-        detailPage('div.product-characteristics div.product-characteristics__group > div.product-characteristics__spec').each((index :number, el :any) => {
+        detailPage('table.jsx-428502957.specification-table > tbody.jsx-428502957').each((index :number, el :any) => {
             let addInfo :any = detailPage(el);
-            let key :string = addInfo.find('> div.product-characteristics__spec-title').text();
-            key = key.replaceAll(/^\s+|\s+$/gm, "");
-            let value :string = addInfo.find('> div.product-characteristics__spec-value').text();
-            value = value.replaceAll(/^\s+|\s+$/gm, "");
-            if (validator.isNotUndefinedOrEmpty(key) && validator.isNotUndefinedOrEmpty(value)) {
-                if (key.includes('Модель')) addinfoObj[key] = value;
-            }
+            let key :string = addInfo.find('> td.jsx-428502957.property-name').text();
+            addinfoObj[key] = addInfo.find('> td.jsx-428502957.property-value').text();
         });
-
-        delete addinfoObj["Режимы и функции съемки"];
-        delete addinfoObj["Режимы и функции фотосъемки"];
-        delete addinfoObj["Особенности, дополнительно"];
-        delete addinfoObj["Особенности и функции видеосъемки"];
 
         return jsonToStr(addinfoObj);
 
@@ -321,18 +343,10 @@ class FalabellaDetail implements AcqDetail {
 
     async getCateInfo(detailPage :any) :Promise<string> {
         let cateList :Array<string> = [];
-        let catelength :number = detailPage('ol.breadcrumb-list > li ').length - 1;
-        detailPage('ol.breadcrumb-list > li ').each((index, el) => {
+        detailPage('ol.Breadcrumbs-module_breadcrumb__3lLwJ > li ').each((index, el) => {
             let cateName :string = '';
-            if (index == catelength - 1) {
-                return;
-            } else if (index == catelength) {
-                cateName = detailPage(el).find(' > span').text();
-                cateList.push(cateName);
-            } else {
-                cateName = detailPage(el).find(' > a').text();
-                cateList.push(cateName);
-            }
+            cateName = detailPage(el).find(' > a').text();
+            cateList.push(cateName);
         });
 
         let goodsCate :string = cateList.join(" > ") + "";

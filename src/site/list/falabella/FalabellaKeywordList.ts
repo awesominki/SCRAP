@@ -166,21 +166,15 @@ async function parsingItemList(categoryList: Array<string>, detailPage: any, pag
         let orgPrice: any = "";
         if (parentDiv.find('span.copy3.septenary.medium.jsx-2889528833.normal').text() !== '') {
             orgPrice = parentDiv.find('span.copy3.septenary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "");
-            if(orgPrice.length > 7) {
-                orgPrice = orgPrice.replace(/\.(?=.*\.)/g, "");
-            }
         }
         else if(parentDiv.find('span.copy3.primary.medium.jsx-2889528833.normal').text() !== ''){
             orgPrice = parentDiv.find('span.copy3.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "");
-            if(orgPrice.length > 7) {
-                orgPrice = orgPrice.replace(/\.(?=.*\.)/g, "");
-            }
         }
         else{
             orgPrice = parentDiv.find('span.copy10.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "");
-            if(orgPrice.length > 7) {
-                orgPrice = orgPrice.replace(/\.(?=.*\.)/g, "");
-            }
+        }
+        if(orgPrice.length > 7) {
+            orgPrice = orgPrice.replace(/\.(?=.*\.)/g, "");
         }
         if (Object.is(orgPrice, NaN)) orgPrice = '';
         if (Object.is(disPrice, NaN)) disPrice = '';
