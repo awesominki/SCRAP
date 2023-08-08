@@ -34,6 +34,7 @@ class FalabellaDetail implements AcqDetail {
             try {
                 try {
                     await page.goto(url, {waitUntil: "networkidle2"}, {timeout: 30000});
+                    await page.click('button.jsx-3459521287.mkp-swatchButton.mkp-swatchButton-collapseButton');
                     await wait.sleep(5);
                 } catch (e) {
                     logger.error(e.message);
@@ -72,17 +73,15 @@ class FalabellaDetail implements AcqDetail {
                 //--price--
                 let orgPrice :any = '';
                 let disPrice :any = 0;
-                if (detailPage('span.copy17.primary.senary.jsx-1164622985').text() !== ''){
-                    orgPrice = detailPage('span.copy17.primary.senary.jsx-1164622985').text().replaceAll(/\s+/gm, "").replaceAll("$","");
-                }else{
-                    let priceDiv : any = detailPage('ol.jsx-749763969.ol-4_GRID.pdp-prices.fa--prices.li-separation');
-                    if(priceDiv.find('li.jsx-749763969.prices-2').attr('data-normal-price') !== ''){
-                        orgPrice = priceDiv.find('li.jsx-749763969.prices-2').attr('data-normal-price').replaceAll(/\s+/gm, "").replaceAll("$","");
-                        disPrice = priceDiv.find('li.jsx-749763969.prices-1').attr('data-internet-price').replaceAll(/\s+/gm, "").replaceAll("$","");
-                    }else{
-                        orgPrice = priceDiv.find('li.jsx-749763969.prices-1').attr('data-normal-price').replaceAll(/\s+/gm, "").replaceAll("$","");
-                        disPrice = priceDiv.find('li.jsx-749763969.prices-0').attr('data-internet-price').replaceAll(/\s+/gm, "").replaceAll("$","");
-                    }
+                if (detailPage('span.copy1.septenary.medium.jsx-1164622985.normal').first().text() !== ''){
+                    orgPrice = detailPage('span.copy1.septenary.medium.jsx-1164622985.normal').first().text().replaceAll(/\s+/gm, "").replaceAll("$","");
+                    disPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').first().text().replaceAll(/\s+/gm, "").replaceAll("$","");
+                }else if(detailPage('span.copy1.primary.medium.jsx-1164622985.normal').first().text() !== ''){
+                    orgPrice = detailPage('span.copy1.primary.medium.jsx-1164622985.normal').first().text().replaceAll(/\s+/gm, "").replaceAll("$","");
+                    disPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').first().text().replaceAll(/\s+/gm, "").replaceAll("$","");
+                }
+                else{
+                    orgPrice = detailPage('span.copy1.septenary.medium.jsx-1164622985.normal').text().replaceAll(/\s+/gm, "").replaceAll("$","");
                 }
                 if(orgPrice.length > 7) {
                     orgPrice = orgPrice.replace(/\.(?=.*\.)/g, "");
@@ -102,8 +101,9 @@ class FalabellaDetail implements AcqDetail {
                     cItem.coltItemDiscountList.push(coltDis);
                 }
 
+
                 // makeColtItem생성
-                await makeItem.makeColtItem(cItem, url, this.collectSite, 'Falabella', '017', goodsName, itemNum, goodsCate,
+                await makeItem.makeColtItem(cItem, url, this.collectSite, 'Falabella', 'CLP', goodsName, itemNum, goodsCate,
                     brand_name, avgPoint, totalEvalutCnt, addInfo, orgPrice, disPrice);
 
                 //--option--
@@ -278,38 +278,55 @@ class FalabellaDetail implements AcqDetail {
 
     async getOptionInfo(detailPage :any, page) :Promise<string[]> {
         let optionList :Array<string> = [];
-        let colorTitle :string = detailPage('span.copy3.primary.jsx-1164622985').text().replaceAll(/\s+/gm, '');
-        let sizeTitle :string = detailPage('span.jsx-592930973.size-title').text();
-        const colorOptionSelector = 'span.copy3.primary.jsx-1164622985.normal';  // 색상 옵션 리스트의 선택자로 변경
+        let colorTitle: string = detailPage('div.jsx-560488783.color-swatch-container.fa--color-swatches__desktop > span.copy3.primary.jsx-1164622985.bold').text();
+        let colorName:string = '';
+        const liElements = detailPage('ul.jsx-1902941898.swatch--container > li');
+        for (let i = 0; i < liElements.length; i++) {
+            const liElement = detailPage(liElements[i]);
+            const button = liElement.find('button.jsx-1902941898.colorSwatch-medium');
+            console.log("button : " + button);
+            await page.evaluate((el) => {el.click();return el.outerHTML;}, button); // 버튼 클릭
+            await page.waitForTimeout(1000);  // 클릭 후 잠시 기다림
+            colorName = detailPage('span.copy3.primary.jsx-1164622985.normal').text().trim();
+            console.log("colorName : " + colorName);
+        }
+        optionList.push(colorTitle + colorName);
+        // optionList = await page.evaluate(async (colorOptionSelector) => {
+        //     const detailPage: any = cheerio.load(await page.content());
+        //     const colorElements = document.querySelectorAll(colorOptionSelector);
+        //     const optionList2 = [];
+        //     colorElements.forEach((colorElement) => {
+        //
+        //         // 색상을 클릭하여 이름이 바뀌는 동작 시뮬레이션
+        //         colorElement.click();
+        //         // 색상 이름 추출 및 배열에 추가
+        //         const colorName = colorElement.textContent.trim();
+        //
+        //         optionList2.push(colorTitle + colorName);
+        //     });
+        //
+        //     colorElements.forEach((colorElement) => {
+        //         colorElement.click();  // 색상을 클릭하여 이름이 바뀌는 동작 시뮬레이션
+        //
+        //         const sizeButtonElements = document.querySelectorAll('div.jsx-592930973.size-options > button');  // 사이즈 버튼 선택자로 변경
+        //
+        //         sizeButtonElements.forEach((sizeButtonElement) => {
+        //             let sizeTitle: string = detailPage('span.jsx-592930973.size-title').text();
+        //             const size = sizeButtonElement.textContent.trim();
+        //             console.log("size : " + size);
+        //             optionList2.push(sizeTitle + size);
+        //         });
+        //     });
+        //     return optionList2;
+        // }, colorOptionSelector);
 
-        await page.evaluate((colorOptionSelector) => {
-            const colorElements = document.querySelectorAll(colorOptionSelector);
-
-            colorElements.forEach((colorElement) => {
-                // 색상을 클릭하여 이름이 바뀌는 동작 시뮬레이션
-                colorElement.click();
-
-                // 색상 이름 추출 및 배열에 추가
-                const colorName = colorElement.textContent.trim();
-                optionList.push(colorTitle + colorName);
-            });
-            colorElements.forEach((colorElement) => {
-                colorElement.click();  // 색상을 클릭하여 이름이 바뀌는 동작 시뮬레이션
-
-                const sizeButtonElements = document.querySelectorAll('div.jsx-592930973.size-options > button');  // 사이즈 버튼 선택자로 변경
-
-                sizeButtonElements.forEach((sizeButtonElement) => {
-                    const size = sizeButtonElement.textContent.trim();
-                    optionList.push(sizeTitle + size);
-                });
-            });
-        }, colorOptionSelector);
+        console.log("optionList : " + optionList);
 
         return optionList;
     }
 
     async getTotalEvalutCnt(detailPage :any) :Promise<number> {
-        let totalEvalutCnt :string = detailPage('div.bv_numReviews_component_container > a.bv_numReviews_text').text();
+        let totalEvalutCnt :string = detailPage('div.bv_numReviews_component_container > div.bv_numReviews_text').text();
         const regex = /\((\d+)\)/; // (숫자) 패턴을 찾는 정규식
         const match = regex.exec(totalEvalutCnt); // 정규식을 문자열에 적용하여 매치 찾기
         let extractedNumber :any = "";
@@ -333,8 +350,8 @@ class FalabellaDetail implements AcqDetail {
 
         detailPage('table.jsx-428502957.specification-table > tbody.jsx-428502957').each((index :number, el :any) => {
             let addInfo :any = detailPage(el);
-            let key :string = addInfo.find('> td.jsx-428502957.property-name').text();
-            addinfoObj[key] = addInfo.find('> td.jsx-428502957.property-value').text();
+            let key :string = addInfo.find('td.jsx-428502957.property-name').text();
+            addinfoObj[key] = addInfo.find('td.jsx-428502957.property-value').text();
         });
 
         return jsonToStr(addinfoObj);
