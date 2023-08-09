@@ -31,14 +31,14 @@ export async function makeColtItem(cItem: ColtItem, url, collectSite, siteName, 
 }
 
 export async function makeColtItemIvt(cIvt: ColtItemIvt, stockId, addPrice, colorOption, sizeOption, styleOption,
-                                      giftOption, option, stockAmount) {
+                                      giftOption, stockOption, stockAmount) {
     cIvt.stockId = stockId;
     cIvt.addPrice = addPrice;
     cIvt.colorOption = colorOption;
     cIvt.sizeOption = sizeOption;
     cIvt.styleOption = styleOption;
     cIvt.giftOption = giftOption;
-    cIvt.option = option;
+    cIvt.stockOption = stockOption;
     cIvt.stockAmount = stockAmount;
 }
 
@@ -71,7 +71,7 @@ export async function makeNotFoundColtItem(cItem: ColtItem, url, collectSite, si
     const ivt = new ColtItemIvt();
     ivt.stockId = itemNum;
     ivt.addPrice = 0;
-    ivt.option = 'Not Found';
+    ivt.stockOption = 'Not Found';
     ivt.stockAmount = -999;
     cItem.coltItemIvtList.push(ivt);
 

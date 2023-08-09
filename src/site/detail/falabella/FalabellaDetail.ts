@@ -81,7 +81,7 @@ class FalabellaDetail implements AcqDetail {
                     disPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').first().text().replaceAll(/\s+/gm, "").replaceAll("$","");
                 }
                 else{
-                    orgPrice = detailPage('span.copy1.septenary.medium.jsx-1164622985.normal').text().replaceAll(/\s+/gm, "").replaceAll("$","");
+                    orgPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').text().replaceAll(/\s+/gm, "").replaceAll("$","");
                 }
                 if(orgPrice.length > 7) {
                     orgPrice = orgPrice.replace(/\.(?=.*\.)/g, "");
@@ -172,7 +172,7 @@ class FalabellaDetail implements AcqDetail {
         }
 
         // stockOption 은 재고있음과 재고없음 둘로 나뉜다(In stock, Out of stock)
-        let stockOption :string = '';
+        let stockOption :string = 'In stock';
         let stockAmout :number = -999;
 
         let avail :string = detailPage('div.product-card-top.product-card-top_full > div.product-card-top__buy > div.product-buy.product-buy_one-line > div').text();
@@ -197,9 +197,6 @@ class FalabellaDetail implements AcqDetail {
         } else if (avail2.includes('Уведомить')) {
             stockOption = 'Out of stock';
             logger.info('The product is notify , ' + avail2.replaceAll(/\n/gm, ''));
-        } else if (voidChk.length == 0) {
-            stockOption = '';
-            logger.info('The product is Void , product_code: ' + product_code);
         } else {
             stockOption = 'In stock';
         }
@@ -284,11 +281,9 @@ class FalabellaDetail implements AcqDetail {
         for (let i = 0; i < liElements.length; i++) {
             const liElement = detailPage(liElements[i]);
             const button = liElement.find('button.jsx-1902941898.colorSwatch-medium');
-            console.log("button : " + button);
-            await page.evaluate((el) => {el.click();return el.outerHTML;}, button); // 버튼 클릭
-            await page.waitForTimeout(1000);  // 클릭 후 잠시 기다림
+            // await page.evaluate((el) => {el.click();return el.outerHTML;}, button); // 버튼 클릭
+            // await page.waitForTimeout(1000);  // 클릭 후 잠시 기다림
             colorName = detailPage('span.copy3.primary.jsx-1164622985.normal').text().trim();
-            console.log("colorName : " + colorName);
         }
         optionList.push(colorTitle + colorName);
         // optionList = await page.evaluate(async (colorOptionSelector) => {
@@ -320,8 +315,6 @@ class FalabellaDetail implements AcqDetail {
         //     return optionList2;
         // }, colorOptionSelector);
 
-        console.log("optionList : " + optionList);
-
         return optionList;
     }
 
@@ -332,9 +325,6 @@ class FalabellaDetail implements AcqDetail {
         let extractedNumber :any = "";
         if (match && match[1]) {
             extractedNumber = match[1]; // 첫 번째 그룹에서 추출한 숫자
-            console.log('Extracted Number:', extractedNumber);
-        } else {
-            console.log('Number not found.');
         }
         return extractedNumber as unknown as number;
     }
@@ -348,7 +338,7 @@ class FalabellaDetail implements AcqDetail {
         // if (await validator.isNotUndefinedOrEmpty(service_rating)) addinfoObj['Reliability assessment'] = service_rating;
 
 
-        detailPage('table.jsx-428502957.specification-table > tbody.jsx-428502957').each((index :number, el :any) => {
+        detailPage('table.jsx-428502957.specification-table > tbody.jsx-428502957 > tr.jsx-428502957').each((index :number, el :any) => {
             let addInfo :any = detailPage(el);
             let key :string = addInfo.find('td.jsx-428502957.property-name').text();
             addinfoObj[key] = addInfo.find('td.jsx-428502957.property-value').text();

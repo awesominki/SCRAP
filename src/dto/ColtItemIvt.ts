@@ -4,7 +4,7 @@ class ColtItemIvt {
     colorOption: string = '';
     sizeOption: string = '';
     giftOption: string = '';
-    option: string = '';
+    stockOption: string = '';
     styleOption: string = '';
     addPrice: number = 0;
     stockAmount: number = 0;

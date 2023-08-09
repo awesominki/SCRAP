@@ -16,15 +16,15 @@ async function launch(){
 */
 
      // list용 실행
-     // category['categoryNameList'] = ["DNS", "ТВ и мультимедиа", "Телевизоры и аксессуары" ,"Телевизоры"]
-     // category['categoryUrl'] = "https://www.falabella.com/falabella-cl/brand/LG"
-     // category['categoryNameList'] = category['categoryNameList'].join( " > ")
-     // const item = await new FalabellaLGKeywordList(chromeConfig,'dynamic.falabella.cl').getItemUrls(category)
+     category['categoryNameList'] = ["DNS", "ТВ и мультимедиа", "Телевизоры и аксессуары" ,"Телевизоры"]
+     category['categoryUrl'] = "https://www.falabella.com/falabella-cl/search?Ntt=oled77"
+     category['categoryNameList'] = category['categoryNameList'].join( " > ")
+     const item = await new FalabellaKeywordList(chromeConfig,'dynamic.falabella.cl').getItemUrls(category)
 
 
     // detail용 실행
-    const item = await new FalabellaDetail(chromeConfig,'dynamic.falabella.cl')
-        .extractItemDetail("https://www.falabella.com/falabella-cl/product/50180252/Adidas-Sports-T-Shirts-Hombre/16661688")
+    // const item = await new FalabellaDetail(chromeConfig,'dynamic.falabella.cl')
+    //     .extractItemDetail("https://www.falabella.com/falabella-cl/product/117661717/ESTABILIZADOR-ZHIYUN-CRANE-2S/117661718")
 
 
     console.log(item)

@@ -157,7 +157,6 @@ async function parsingItemList(categoryList: Array<string>, detailPage: any, pag
         let url: string = parentDiv.find('div > div > a ').attr('href');
         let goodsName: string = parentDiv.find('div > a > span > b.jsx-1833870204.copy2.primary.jsx-2889528833.normal').text();
         let thumbnail: string = parentDiv.find('div.jsx-1833870204.jsx-3831830274.pod-head > div > a > picture > img').attr('src');
-        console.log(thumbnail)
         // if (validate.isNotUndefinedOrEmpty(thumbnail)) {
         //     thumbnail = '';
         // }
