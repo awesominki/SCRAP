@@ -16,15 +16,15 @@ async function launch(){
 */
 
      // list용 실행
-     category['categoryNameList'] = ["DNS", "ТВ и мультимедиа", "Телевизоры и аксессуары" ,"Телевизоры"]
-     category['categoryUrl'] = "https://www.falabella.com/falabella-cl/search?Ntt=oled77"
-     category['categoryNameList'] = category['categoryNameList'].join( " > ")
-     const item = await new FalabellaKeywordList(chromeConfig,'dynamic.falabella.cl').getItemUrls(category)
+     // category['categoryNameList'] = ["DNS", "ТВ и мультимедиа", "Телевизоры и аксессуары" ,"Телевизоры"]
+     // category['categoryUrl'] = "https://www.falabella.com/falabella-cl/search?Ntt=oled77"
+     // category['categoryNameList'] = category['categoryNameList'].join( " > ")
+     // const item = await new FalabellaKeywordList(chromeConfig,'dynamic.falabella.cl').getItemUrls(category)
 
 
     // detail용 실행
-    // const item = await new FalabellaDetail(chromeConfig,'dynamic.falabella.cl')
-    //     .extractItemDetail("https://www.falabella.com/falabella-cl/product/117661717/ESTABILIZADOR-ZHIYUN-CRANE-2S/117661718")
+    const item = await new FalabellaDetail(chromeConfig,'dynamic.falabella.cl')
+        .extractItemDetail("https://www.falabella.com/falabella-cl/product/16719348/OLED-65''-OLED65C3-4K-TV-UHD-TV-Smart-TV-2023-+-Magic-Remote-LG/16719348")
 
 
     console.log(item)

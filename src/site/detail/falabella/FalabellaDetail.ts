@@ -46,7 +46,7 @@ class FalabellaDetail implements AcqDetail {
                 let cItem :ColtItem = new ColtItem();
                 const detailPage :any = cheerio.load(await page.content());
 
-                const goodsName :string = detailPage('h1.jsx-1267102499.product-name.fa--product-name.false').text();
+                const goodsName :string = detailPage('h1.jsx-1680787435.product-name.fa--product-name.false').text();
                 const itemNum :string = await this.getItemNum(url);
                 if (!await validator.isNotUndefinedOrEmpty(goodsName)) {
                     await makeItem.makeNotFoundColtItem(cItem, url, this.collectSite, itemNum, detailPage, '97');
@@ -56,18 +56,24 @@ class FalabellaDetail implements AcqDetail {
 
                 let goodsCate :string = await this.getCateInfo(detailPage);
                 if (await validator.isNotUndefinedOrEmpty(goodsCate)) {
-                    goodsCate = '(#M)' + goodsCate;
+                    goodsCate = 'LGDP > FALABELLA_CL > ' + goodsCate;
                 } else {
                     goodsCate = 'NO_CATEGORY';
                 }
 
                 // product_code -> 제품의 모델넘머로 addInfo에 추가해주면 좋음
-                const product_code :string = detailPage('span.jsx-3410277752').text().replaceAll(/\D+/gm, '');
+                let product_code :string = '';
+                detailPage('table.jsx-428502957.specification-table > tbody.jsx-428502957 > tr.jsx-428502957').each((index :number, el :any) => {
+                    let addInfo :any = detailPage(el);
+                    if(addInfo.find('td.jsx-428502957.property-name').text() === "Modelo") {
+                        product_code = addInfo.find('td.jsx-428502957.property-value').text();
+                    }
+                });
                 let brand_name :string = detailPage('a.jsx-1874573512.product-brand-link').text();
                 let avgPoint :number = detailPage('div.bv_avgRating_component_container.notranslate').text(); //as unknown as number;
                 if (!await validator.isNotUndefinedOrEmpty(avgPoint)) avgPoint = 0;
                 let totalEvalutCnt :number= await this.getTotalEvalutCnt(detailPage) // as unknown as number;
-                let addInfo :string = await this.getAddInfo(detailPage, product_code);
+                let addInfo :string = await this.getAddInfo(product_code,brand_name);
 
 
                 //--price--
@@ -329,28 +335,18 @@ class FalabellaDetail implements AcqDetail {
         return extractedNumber as unknown as number;
     }
 
-    async getAddInfo(detailPage :any, product_code :string) {
+    async getAddInfo(product_code :string,brand_name :string) {
         var addinfoObj :Object = new Object();
-        addinfoObj['Product code'] = product_code;
-        // let service_rating :string = detailPage('div.product-card-top__stat > a.product-card-top__service-rating').text().replaceAll(/,/gm, '.');
-        // let service_comment :string = detailPage('div.product-card-top__stat > a.product-card-top__comments').text().trim();
-        // if (await validator.isNotUndefinedOrEmpty(service_comment)) addinfoObj['Communicator'] = service_comment;
-        // if (await validator.isNotUndefinedOrEmpty(service_rating)) addinfoObj['Reliability assessment'] = service_rating;
-
-
-        detailPage('table.jsx-428502957.specification-table > tbody.jsx-428502957 > tr.jsx-428502957').each((index :number, el :any) => {
-            let addInfo :any = detailPage(el);
-            let key :string = addInfo.find('td.jsx-428502957.property-name').text();
-            addinfoObj[key] = addInfo.find('td.jsx-428502957.property-value').text();
-        });
-
+        addinfoObj['MPC'] = product_code;
+        addinfoObj['country'] = 'Chile';
+        addinfoObj['brand'] = brand_name;
         return jsonToStr(addinfoObj);
 
     }
 
     async getCateInfo(detailPage :any) :Promise<string> {
         let cateList :Array<string> = [];
-        detailPage('ol.Breadcrumbs-module_breadcrumb__3lLwJ > li ').each((index, el) => {
+        detailPage('ol.Breadcrumbs-module_breadcrumb__3lLwJ > li:not(:first-child)').each((index, el) => {
             let cateName :string = '';
             cateName = detailPage(el).find(' > a').text();
             cateList.push(cateName);
