@@ -159,22 +159,16 @@ async function parsingItemList(categoryList: Array<string>, detailPage: any, pag
         //     thumbnail = '';
         // }
 
-        let disPrice: any = parentDiv.find('span.copy10.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$","");
-        if(disPrice.length > 7) {
-            disPrice = disPrice.replace(/\.(?=.*\.)/g, "");
-        }
+        let disPrice: any = parentDiv.find('span.copy10.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$","").replaceAll(".","");
         let orgPrice: any = "";
         if (parentDiv.find('span.copy3.septenary.medium.jsx-2889528833.normal').text() !== '') {
-            orgPrice = parentDiv.find('span.copy3.septenary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "");
+            orgPrice = parentDiv.find('span.copy3.septenary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "").replaceAll(".","");
         }
         else if(parentDiv.find('span.copy3.primary.medium.jsx-2889528833.normal').text() !== ''){
-            orgPrice = parentDiv.find('span.copy3.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "");
+            orgPrice = parentDiv.find('span.copy3.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "").replaceAll(".","");
         }
         else{
-            orgPrice = parentDiv.find('span.copy10.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "");
-        }
-        if(orgPrice.length > 7) {
-            orgPrice = orgPrice.replace(/\.(?=.*\.)/g, "");
+            orgPrice = parentDiv.find('span.copy10.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "").replaceAll(".","");
         }
         if (Object.is(orgPrice, NaN)) orgPrice = '';
         if (Object.is(disPrice, NaN)) disPrice = '';

@@ -50,7 +50,7 @@ class FalabellaDetail implements AcqDetail {
                 const itemNum :string = await this.getItemNum(url);
                 if (!await validator.isNotUndefinedOrEmpty(goodsName)) {
                     await makeItem.makeNotFoundColtItem(cItem, url, this.collectSite, itemNum, detailPage, '97');
-                    return cItem;
+                    return null;
                 }
                 logger.info('itemNum: ' + itemNum + ' TITLE:' + goodsName);
 
@@ -80,20 +80,14 @@ class FalabellaDetail implements AcqDetail {
                 let orgPrice :any = '';
                 let disPrice :any = 0;
                 if (detailPage('span.copy1.septenary.medium.jsx-1164622985.normal').first().text() !== ''){
-                    orgPrice = detailPage('span.copy1.septenary.medium.jsx-1164622985.normal').first().text().replaceAll(/\s+/gm, "").replaceAll("$","");
-                    disPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').first().text().replaceAll(/\s+/gm, "").replaceAll("$","");
+                    orgPrice = detailPage('span.copy1.septenary.medium.jsx-1164622985.normal').first().text().replaceAll(/\s+/gm, "").replaceAll("$","").replaceAll(".","");
+                    disPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').first().text().replaceAll(/\s+/gm, "").replaceAll("$","").replaceAll(".","");
                 }else if(detailPage('span.copy1.primary.medium.jsx-1164622985.normal').first().text() !== ''){
-                    orgPrice = detailPage('span.copy1.primary.medium.jsx-1164622985.normal').first().text().replaceAll(/\s+/gm, "").replaceAll("$","");
-                    disPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').first().text().replaceAll(/\s+/gm, "").replaceAll("$","");
+                    orgPrice = detailPage('span.copy1.primary.medium.jsx-1164622985.normal').first().text().replaceAll(/\s+/gm, "").replaceAll("$","").replaceAll(".","");
+                    disPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').first().text().replaceAll(/\s+/gm, "").replaceAll("$","").replaceAll(".","");
                 }
-                else{
-                    orgPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').text().replaceAll(/\s+/gm, "").replaceAll("$","");
-                }
-                if(orgPrice.length > 7) {
-                    orgPrice = orgPrice.replace(/\.(?=.*\.)/g, "");
-                }
-                if(disPrice.length > 7) {
-                    disPrice = disPrice.replace(/\.(?=.*\.)/g, "");
+                else {
+                    orgPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').text().replaceAll(/\s+/gm, "").replaceAll("$", "").replaceAll(".","");
                 }
                 let ivtAddPrice :number = orgPrice;
 
@@ -282,45 +276,20 @@ class FalabellaDetail implements AcqDetail {
     async getOptionInfo(detailPage :any, page) :Promise<string[]> {
         let optionList :Array<string> = [];
         let colorTitle: string = detailPage('div.jsx-560488783.color-swatch-container.fa--color-swatches__desktop > span.copy3.primary.jsx-1164622985.bold').text();
-        let colorName:string = '';
-        const liElements = detailPage('ul.jsx-1902941898.swatch--container > li');
-        for (let i = 0; i < liElements.length; i++) {
-            const liElement = detailPage(liElements[i]);
-            const button = liElement.find('button.jsx-1902941898.colorSwatch-medium');
-            // await page.evaluate((el) => {el.click();return el.outerHTML;}, button); // 버튼 클릭
-            // await page.waitForTimeout(1000);  // 클릭 후 잠시 기다림
-            colorName = detailPage('span.copy3.primary.jsx-1164622985.normal').text().trim();
+        let colorNameList:Array<string> = [];
+        let colorName: string = '';
+        // colorName = detailPage('span.copy3.primary.jsx-1164622985.normal').text().trim();
+        // colorNameList.push(colorName);
+        const buttonElements = await page.$$('button.jsx-911471698.colorSwatch-medium'); // 해당 클래스의 모든 버튼 요소 선택
+        for (const buttonElement of buttonElements){
+            await buttonElement.click();
+            await page.waitForTimeout(1000);  // 클릭 후 잠시 기다림
+            const detailPage2 :any = cheerio.load(await page.content());
+            colorName = detailPage2('span.copy3.primary.jsx-1164622985.normal').text().trim();
+            colorNameList.push(colorName);
         }
-        optionList.push(colorTitle + colorName);
-        // optionList = await page.evaluate(async (colorOptionSelector) => {
-        //     const detailPage: any = cheerio.load(await page.content());
-        //     const colorElements = document.querySelectorAll(colorOptionSelector);
-        //     const optionList2 = [];
-        //     colorElements.forEach((colorElement) => {
-        //
-        //         // 색상을 클릭하여 이름이 바뀌는 동작 시뮬레이션
-        //         colorElement.click();
-        //         // 색상 이름 추출 및 배열에 추가
-        //         const colorName = colorElement.textContent.trim();
-        //
-        //         optionList2.push(colorTitle + colorName);
-        //     });
-        //
-        //     colorElements.forEach((colorElement) => {
-        //         colorElement.click();  // 색상을 클릭하여 이름이 바뀌는 동작 시뮬레이션
-        //
-        //         const sizeButtonElements = document.querySelectorAll('div.jsx-592930973.size-options > button');  // 사이즈 버튼 선택자로 변경
-        //
-        //         sizeButtonElements.forEach((sizeButtonElement) => {
-        //             let sizeTitle: string = detailPage('span.jsx-592930973.size-title').text();
-        //             const size = sizeButtonElement.textContent.trim();
-        //             console.log("size : " + size);
-        //             optionList2.push(sizeTitle + size);
-        //         });
-        //     });
-        //     return optionList2;
-        // }, colorOptionSelector);
-
+        console.log("colorName : " + colorNameList);
+        optionList.push(colorTitle + colorNameList);
         return optionList;
     }
 

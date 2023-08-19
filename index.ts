@@ -24,7 +24,7 @@ async function launch(){
 
     // detail용 실행
     const item = await new FalabellaDetail(chromeConfig,'dynamic.falabella.cl')
-        .extractItemDetail("https://www.falabella.com/falabella-cl/product/16719348/OLED-65''-OLED65C3-4K-TV-UHD-TV-Smart-TV-2023-+-Magic-Remote-LG/16719348")
+        .extractItemDetail("https://www.falabella.com/falabella-cl/product/50180289/Adidas-Pantalon-de-Buzo-Deportivo-Hombre/16661741")
 
 
     console.log(item)
