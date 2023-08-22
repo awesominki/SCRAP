@@ -108,26 +108,36 @@ class FalabellaDetail implements AcqDetail {
 
                 //--option--
                 // item이 해당하는 옵션들을 가져옴
-                let optionList :Array<string> = await this.getOptionInfo(detailPage,page);
+                let optionList :Array<string> = [];
+                let colorTitle: string = detailPage('div.jsx-560488783.color-swatch-container.fa--color-swatches__desktop > span.copy3.primary.jsx-1164622985.bold').text().replace(":", "").trim();
+                cItem.colorOption = colorTitle;
+                let sizeTitle: string = detailPage('span.jsx-2470060866.size-title').text();
+                cItem.sizeOption = sizeTitle;
+                let size : any = '';
+                let colorName: string = '';
+                let avail :number = 1;
+                const buttonElements = await page.$$('button.jsx-911471698.colorSwatch-medium'); // 해당 클래스의 모든 버튼 요소 선택
+                for (const buttonElement of buttonElements){
+                    await buttonElement.click();
+                    await page.waitForTimeout(1000);  // 클릭 후 잠시 기다림
+                    const detailPage2 :any = cheerio.load(await page.content());
+                    colorName = detailPage2('span.copy3.primary.jsx-1164622985.normal').text().trim();
+                    optionList[0] = colorName;
+                    let optionDiv :any = detailPage2('div.jsx-2470060866.size-options');
+                    optionDiv.find('button').each(async (index: number, el: any) => {
+                        avail = 1;
+                        size = detailPage2(el).text().trim();
+                        optionList[1] = size;
+                        if(detailPage2(el).attr("disabled") !== undefined){
+                            avail = 0;
+                        }
+                        // 재고 정보 추가
+                        await this.getStockInfo(cItem, page, detailPage2, url, optionList, product_code, ivtAddPrice, avail);
+                    });
+                }
 
-                //--image and video--
-                // 비디오와 이미지 url을 가져옴
-                // let imageList :Array<string> = [];
-                // try {
-                //     imageList = await this.getImageAndVideoInfo(detailPage, context);
-                // } catch (error) {
-                //     console.log('getImageAndVideoInfo Fail');
-                // }
-                // // 가져온 미디어 url들을 coltImage 데이터로 만들어서 cItem에 추가한다
-                // imageList.map((image) => {
-                //     const coltImage :ColtImage = new ColtImage();
-                //     coltImage.goodsImage = image;
-                //     coltImage.hash = hash.toHash(image);
-                //     cItem.coltImageList.push(coltImage);
-                // });
 
-                // 재고 정보 추가
-                await this.getStockInfo(cItem, page, detailPage, url, optionList, product_code, ivtAddPrice);
+
                 return cItem;
             } catch (error) {
                 logger.error(error.stack);
@@ -141,7 +151,7 @@ class FalabellaDetail implements AcqDetail {
 
 
     // 옵션 및 재고를 추가하는 함수
-    async getStockInfo(cItem :ColtItem, page :any, detailPage :any, url :string, optionList :Array<string>, product_code :string, ivtAddPrice:number) {
+    async getStockInfo(cItem :ColtItem, page :any, detailPage :any, url :string, optionList :Array<string>, product_code :string, ivtAddPrice:number,avail:number) {
         //옵션설정
         let option1 :string = '';
         let option2 :string = '';
@@ -153,19 +163,15 @@ class FalabellaDetail implements AcqDetail {
                 switch (i) {
                     case 0:
                         option1 = optionList[i];
-                        cItem.colorOption = option1;
                         break;
                     case 1:
                         option2 = optionList[i];
-                        cItem.sizeOption = option2;
                         break;
                     case 2:
                         option3 = optionList[i];
-                        cItem.styleOption = option3;
                         break;
                     case 3:
                         option4 = optionList[i];
-                        cItem.giftOption = option4;
                         break;
                 }
             }
@@ -175,29 +181,12 @@ class FalabellaDetail implements AcqDetail {
         let stockOption :string = 'In stock';
         let stockAmout :number = -999;
 
-        let avail :string = detailPage('div.product-card-top.product-card-top_full > div.product-card-top__buy > div.product-buy.product-buy_one-line > div').text();
-        let avail1 :string = detailPage('div.order-avail-wrap.order-avail-wrap_not-avail').text();
-        let avail2 :string = detailPage('div.product-card-top__buy > div.product-buy > button.button-ui.notify-btn').text();
-        let voidChk :any = detailPage('div.product-card-top__buy > div.product-buy > button.button-ui.buy-btn');
-
 
         // 품절 확인
-        if (avail.includes('Товара нет в наличии')) {
+        if (avail == 0) {
             stockOption = 'Out of stock';
-            logger.info('The product is out of stock , ' + avail);
-        } else if (avail.includes('Скоро будет доступен')) {
-            stockOption = '';
-            logger.info('Coming Soon , ' + avail + ",  product_code: " + product_code);
-        } else if (avail.includes('Продажи прекращены')) {
-            stockOption = 'Out of stock';
-            logger.info('Sales discontinued , ' + avail);
-        } else if (avail1.includes('Товара нет в наличии')) {
-            stockOption = 'Out of stock';
-            logger.info('The product is out of stock , ' + avail1.replaceAll(/\n/gm, ''));
-        } else if (avail2.includes('Уведомить')) {
-            stockOption = 'Out of stock';
-            logger.info('The product is notify , ' + avail2.replaceAll(/\n/gm, ''));
-        } else {
+            logger.info('The product is out of stock');
+        }else {
             stockOption = 'In stock';
         }
 
@@ -277,6 +266,8 @@ class FalabellaDetail implements AcqDetail {
         let optionList :Array<string> = [];
         let colorTitle: string = detailPage('div.jsx-560488783.color-swatch-container.fa--color-swatches__desktop > span.copy3.primary.jsx-1164622985.bold').text();
         let colorNameList:Array<string> = [];
+        let size : any = '';
+        let sizeList:Array<string> = [];
         let colorName: string = '';
         // colorName = detailPage('span.copy3.primary.jsx-1164622985.normal').text().trim();
         // colorNameList.push(colorName);
@@ -287,7 +278,15 @@ class FalabellaDetail implements AcqDetail {
             const detailPage2 :any = cheerio.load(await page.content());
             colorName = detailPage2('span.copy3.primary.jsx-1164622985.normal').text().trim();
             colorNameList.push(colorName);
+            let optionDiv :any = detailPage2('div.jsx-2470060866.size-options');
+            optionDiv.find('button').each((index : number, el : any) => {
+                if (el.attribs.disabled !== undefined) {     // 선택된 옵션을 찾음
+                    size = detailPage2(el).text().trim();
+                    sizeList.push(size);
+                }
+            });
         }
+        console.log("sizeList : " + sizeList);
         console.log("colorName : " + colorNameList);
         optionList.push(colorTitle + colorNameList);
         return optionList;
