@@ -4,6 +4,9 @@ import {options as chromeConfig} from "./src/config/chrome/ChromeConfig";
 import {FalabellaDetail} from "./src/site/detail/falabella/FalabellaDetail";
 import {FalabellaKeywordList} from "./src/site/list/falabella/FalabellaKeywordList";
 import {FalabellaLGKeywordList} from "./src/site/list/falabella/FalabellaLGKeywordList";
+import {DatartKeywordList} from "./src/site/list/datart/DatartKeywordList";
+import {DatartLGKeywordList} from "./src/site/list/datart/DatartLGKeywordList";
+import {DatartDetail} from "./src/site/detail/datart/DatartDetail";
 
 async function launch(){
     const category = {}
@@ -16,15 +19,15 @@ async function launch(){
 */
 
      // list용 실행
-     // category['categoryNameList'] = ["DNS", "ТВ и мультимедиа", "Телевизоры и аксессуары" ,"Телевизоры"]
-     // category['categoryUrl'] = "https://www.falabella.com/falabella-cl/search?Ntt=oled77"
-     // category['categoryNameList'] = category['categoryNameList'].join( " > ")
-     // const item = await new FalabellaKeywordList(chromeConfig,'dynamic.falabella.cl').getItemUrls(category)
+     category['categoryNameList'] = ["DNS", "ТВ и мультимедиа", "Телевизоры и аксессуары" ,"Телевизоры"]
+     category['categoryUrl'] = "https://www.datart.cz/vyhledavani?q=oled"
+     category['categoryNameList'] = category['categoryNameList'].join( " > ")
+     const item = await new DatartKeywordList(chromeConfig,'dynamic.falabella.cl').getItemUrls(category)
 
 
     // detail용 실행
-    const item = await new FalabellaDetail(chromeConfig,'dynamic.falabella.cl')
-        .extractItemDetail("https://www.falabella.com/falabella-cl/product/50180289/Adidas-Pantalon-de-Buzo-Deportivo-Hombre/16661741")
+    // const item = await new DatartDetail(chromeConfig,'dynamic.datart.cz')
+    //     .extractItemDetail("https://www.datart.cz/televize-sony-xr-42a90k.html")
 
 
     console.log(item)
