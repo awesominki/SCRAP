@@ -34,7 +34,7 @@ class DatartDetail implements AcqDetail {
             try {
                 try {
                     await page.goto(url, {waitUntil: "networkidle2"}, {timeout: 30000});
-                    await page.click('button.jsx-3459521287.mkp-swatchButton.mkp-swatchButton-collapseButton');
+                    //await page.click('button.jsx-3459521287.mkp-swatchButton.mkp-swatchButton-collapseButton');
                     await wait.sleep(5);
                 } catch (e) {
                     logger.error(e.message);
@@ -46,31 +46,31 @@ class DatartDetail implements AcqDetail {
                 let cItem :ColtItem = new ColtItem();
                 const detailPage :any = cheerio.load(await page.content());
 
-                const goodsName :string = detailPage('h1.jsx-1680787435.product-name.fa--product-name.false').text();
-                const itemNum :string = await this.getItemNum(url);
+                const goodsName :string = detailPage('h1.product-detail-title').text();
+                const itemNum :string = detailPage('div.code-widget > span:nth-child(2)').text().split(":")[1].trim();
                 if (!await validator.isNotUndefinedOrEmpty(goodsName)) {
-                    await makeItem.makeNotFoundColtItem(cItem, url, this.collectSite, itemNum, detailPage, '97');
+                    await makeItem.makeNotFoundColtItem(cItem, url, this.collectSite, 'Datart', detailPage, itemNum);
                     return null;
                 }
                 logger.info('itemNum: ' + itemNum + ' TITLE:' + goodsName);
 
                 let goodsCate :string = await this.getCateInfo(detailPage);
                 if (await validator.isNotUndefinedOrEmpty(goodsCate)) {
-                    goodsCate = 'LGDP > FALABELLA_CL > ' + goodsCate;
+                    goodsCate = 'LGDP > DATART_CZ > ' + goodsCate;
                 } else {
                     goodsCate = 'NO_CATEGORY';
                 }
 
                 // product_code -> 제품의 모델넘머로 addInfo에 추가해주면 좋음
-                let product_code :string = '';
-                detailPage('table.jsx-428502957.specification-table > tbody.jsx-428502957 > tr.jsx-428502957').each((index :number, el :any) => {
-                    let addInfo :any = detailPage(el);
-                    if(addInfo.find('td.jsx-428502957.property-name').text() === "Modelo") {
-                        product_code = addInfo.find('td.jsx-428502957.property-value').text();
-                    }
-                });
-                let brand_name :string = detailPage('a.jsx-1874573512.product-brand-link').text();
-                let avgPoint :number = detailPage('div.bv_avgRating_component_container.notranslate').text(); //as unknown as number;
+                let product_code :string = detailPage('div.code-widget > span:nth-child(1)').text().split(":")[1].trim();
+                // detailPage('table.jsx-428502957.specification-table > tbody.jsx-428502957 > tr.jsx-428502957').each((index :number, el :any) => {
+                //     let addInfo :any = detailPage(el);
+                //     if(addInfo.find('td.jsx-428502957.property-name').text() === "Modelo") {
+                //         product_code = addInfo.find('td.jsx-428502957.property-value').text();
+                //     }
+                // });
+                let brand_name :string = detailPage('div.brand-logo > a > img').attr('alt');
+                let avgPoint :number = detailPage('div.rating-wrap > a > span:nth-child(2)').text(); //as unknown as number;
                 if (!await validator.isNotUndefinedOrEmpty(avgPoint)) avgPoint = 0;
                 let totalEvalutCnt :number= await this.getTotalEvalutCnt(detailPage) // as unknown as number;
                 let addInfo :string = await this.getAddInfo(product_code,brand_name);
@@ -79,15 +79,13 @@ class DatartDetail implements AcqDetail {
                 //--price--
                 let orgPrice :any = '';
                 let disPrice :any = 0;
-                if (detailPage('span.copy1.septenary.medium.jsx-1164622985.normal').first().text() !== ''){
-                    orgPrice = detailPage('span.copy1.septenary.medium.jsx-1164622985.normal').first().text().replaceAll(/\s+/gm, "").replaceAll("$","").replaceAll(".","");
-                    disPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').first().text().replaceAll(/\s+/gm, "").replaceAll("$","").replaceAll(".","");
-                }else if(detailPage('span.copy1.primary.medium.jsx-1164622985.normal').first().text() !== ''){
-                    orgPrice = detailPage('span.copy1.primary.medium.jsx-1164622985.normal').first().text().replaceAll(/\s+/gm, "").replaceAll("$","").replaceAll(".","");
-                    disPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').first().text().replaceAll(/\s+/gm, "").replaceAll("$","").replaceAll(".","");
+                if (detailPage('span.cut-price > del').first().text() !== ''){
+                    orgPrice = detailPage('span.cut-price > del').first().text().replaceAll(/\s+/gm, "").replaceAll("Kč","");
+                    disPrice = detailPage('div.product-price-main > div.price-wrap').text().replace(/\D/g, '');
                 }
                 else {
-                    orgPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').text().replaceAll(/\s+/gm, "").replaceAll("$", "").replaceAll(".","");
+                    orgPrice = detailPage('div.product-price-main > div.price-wrap').text().replace(/\D/g, '');
+                    disPrice = orgPrice;
                 }
                 let ivtAddPrice :number = orgPrice;
 
@@ -103,12 +101,13 @@ class DatartDetail implements AcqDetail {
 
 
                 // makeColtItem생성
-                await makeItem.makeColtItem(cItem, url, this.collectSite, 'Falabella', 'CLP', goodsName, itemNum, goodsCate,
+                await makeItem.makeColtItem(cItem, url, this.collectSite, 'Datart', 'CZK', goodsName, itemNum, goodsCate,
                     brand_name, avgPoint, totalEvalutCnt, addInfo, orgPrice, disPrice);
 
                 //--option--
                 // item이 해당하는 옵션들을 가져옴
                 let optionList :Array<string> = [];
+                await this.getStockInfo(cItem, page, detailPage, url, optionList, product_code, ivtAddPrice, 1);
                 let colorTitle: string = detailPage('div.jsx-560488783.color-swatch-container.fa--color-swatches__desktop > span.copy3.primary.jsx-1164622985.bold').text().replace(":", "").trim();
                 cItem.colorOption = colorTitle;
                 let sizeTitle: string = detailPage('span.jsx-2470060866.size-title').text();
@@ -293,20 +292,20 @@ class DatartDetail implements AcqDetail {
     }
 
     async getTotalEvalutCnt(detailPage :any) :Promise<number> {
-        let totalEvalutCnt :string = detailPage('div.bv_numReviews_component_container > div.bv_numReviews_text').text();
-        const regex = /\((\d+)\)/; // (숫자) 패턴을 찾는 정규식
-        const match = regex.exec(totalEvalutCnt); // 정규식을 문자열에 적용하여 매치 찾기
-        let extractedNumber :any = "";
-        if (match && match[1]) {
-            extractedNumber = match[1]; // 첫 번째 그룹에서 추출한 숫자
-        }
-        return extractedNumber as unknown as number;
+        let totalEvalutCnt :string = detailPage('span.text-underline').text();
+        // const regex = /\((\d+)\)/; // (숫자) 패턴을 찾는 정규식
+        // const match = regex.exec(totalEvalutCnt); // 정규식을 문자열에 적용하여 매치 찾기
+        // let extractedNumber :any = "";
+        // if (match && match[1]) {
+        //     extractedNumber = match[1]; // 첫 번째 그룹에서 추출한 숫자
+        // }
+        return totalEvalutCnt as unknown as number;
     }
 
     async getAddInfo(product_code :string,brand_name :string) {
         var addinfoObj :Object = new Object();
         addinfoObj['MPC'] = product_code;
-        addinfoObj['country'] = 'Chile';
+        addinfoObj['country'] = 'Czech';
         addinfoObj['brand'] = brand_name;
         return jsonToStr(addinfoObj);
 
@@ -314,7 +313,7 @@ class DatartDetail implements AcqDetail {
 
     async getCateInfo(detailPage :any) :Promise<string> {
         let cateList :Array<string> = [];
-        detailPage('ol.Breadcrumbs-module_breadcrumb__3lLwJ > li:not(:first-child)').each((index, el) => {
+        detailPage('ol.breadcrumb.swiper-wrapper > li:not(:first-child)').each((index, el) => {
             let cateName :string = '';
             cateName = detailPage(el).find(' > a').text();
             cateList.push(cateName);

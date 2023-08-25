@@ -88,6 +88,7 @@ class FalabellaDetail implements AcqDetail {
                 }
                 else {
                     orgPrice = detailPage('span.copy17.primary.senary.jsx-1164622985.bold').text().replaceAll(/\s+/gm, "").replaceAll("$", "").replaceAll(".","");
+                    disPrice = orgPrice;
                 }
                 let ivtAddPrice :number = orgPrice;
 

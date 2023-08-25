@@ -13,8 +13,8 @@ let dateUtils = require('../../../util/DateUtil');
 const wait = require('../../../util/WaitUtil')
 const validate = require('../../../util/ValidatorUtil')
 
-const COLLECT_SITE: string = 'dynamic.falabella.cl'
-const SITE_NAME: string = 'FALABELLA_CL_DP'
+const COLLECT_SITE: string = 'dynamic.datart.cz'
+const SITE_NAME: string = 'DATART_CZ_DP'
 
 class DatartKeywordList implements AcqList {
 
@@ -150,8 +150,8 @@ async function parsingItemList(categoryList: Array<string>, detailPage: any, pag
         // if (validate.isNotUndefinedOrEmpty(thumbnail)) {
         //     thumbnail = '';
         // }
-        let itemNum: string = parentDiv.find('div > div > div.product-box').attr('data-track');
-        console.log("itemNum : " + itemNum);
+        const jsonObject = JSON.parse(parentDiv.find('div > div > div.product-box').attr('data-track'));
+        let itemNum = jsonObject.id;
         // const match = htmlString.match(regex); // 정규식 매칭
         // const itemNum = match[1];
         // console.log("itemNum : " + itemNum);
