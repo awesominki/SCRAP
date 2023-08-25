@@ -19,15 +19,15 @@ async function launch(){
 */
 
      // list용 실행
-     // category['categoryNameList'] = ["DNS", "ТВ и мультимедиа", "Телевизоры и аксессуары" ,"Телевизоры"]
-     // category['categoryUrl'] = "https://www.datart.cz/vyhledavani/filter/x:lb.parametricFilter.brand:LG?q=lg&"
-     // category['categoryNameList'] = category['categoryNameList'].join( " > ")
-     // const item = await new DatartLGKeywordList(chromeConfig,'dynamic.datart.cz').getItemUrls(category)
+     category['categoryNameList'] = ["DNS", "ТВ и мультимедиа", "Телевизоры и аксессуары" ,"Телевизоры"]
+     category['categoryUrl'] = "https://www.datart.cz/vyhledavani?q=oled"
+     category['categoryNameList'] = category['categoryNameList'].join( " > ")
+     const item = await new DatartKeywordList(chromeConfig,'dynamic.datart.cz').getItemUrls(category)
 
 
     // detail용 실행
-    const item = await new DatartDetail(chromeConfig,'dynamic.datart.cz')
-        .extractItemDetail("https://www.datart.cz/chladnicka-s-mraznickou-lg-gbp62mcnbc-cerna.html")
+    // const item = await new DatartDetail(chromeConfig,'dynamic.datart.cz')
+    //     .extractItemDetail("https://www.datart.cz/chladnicka-s-mraznickou-lg-gbp62mcnbc-cerna.html")
 
 
     console.log(item)

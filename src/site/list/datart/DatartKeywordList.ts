@@ -139,19 +139,18 @@ class DatartKeywordList implements AcqList {
 async function parsingItemList(categoryList: Array<string>, detailPage: any, pageNum: number, coltBaseUrlList: Array<ColtBaseUrlItem>): Promise<void> {
     let rank: number = coltBaseUrlList.length + 1;
 
-    detailPage('#snippet--searchProductList > div > div').each((index: number, content: any) => {
+    detailPage('div.row.row-no-padding > div > div > div').each((index: number, content: any) => {
         let bsItem: ColtBaseUrlItem = new ColtBaseUrlItem(new ColtShelfItem());
         let bsCate: ColtBaseUrlCate = new ColtBaseUrlCate();
         let bsRank: ColtBaseUrlRank = new ColtBaseUrlRank();
         let parentDiv: any = detailPage(content);
-        let url: string = parentDiv.find('div > div > div > a ').attr('href');
+        let url: string = parentDiv.find('a.product-box-link-box').attr('href');
         let goodsName: string = parentDiv.find('div > a > span > b.jsx-1833870204.copy2.primary.jsx-2889528833.normal').text();
         let thumbnail: string = parentDiv.find('div.jsx-1833870204.jsx-3831830274.pod-head > div > a > picture > img').attr('src');
         // if (validate.isNotUndefinedOrEmpty(thumbnail)) {
         //     thumbnail = '';
         // }
-        const jsonObject = JSON.parse(parentDiv.find('div > div > div.product-box').attr('data-track'));
-        let itemNum = jsonObject.id;
+        let itemNum = '';
         // const match = htmlString.match(regex); // 정규식 매칭
         // const itemNum = match[1];
         // console.log("itemNum : " + itemNum);
