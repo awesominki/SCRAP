@@ -6,11 +6,6 @@
     "auditLog": "logs\\.1c21438f0ff3ec1fbdf9bf463f7a73d979d04e2b-audit.json",
     "files": [
         {
-            "date": 1691823820976,
-            "name": "logs\\puppeteer-2023-08-12.log",
-            "hash": "169127ffe7ce34d0c8192e87df05301e"
-        },
-        {
             "date": 1692418891132,
             "name": "logs\\puppeteer-2023-08-19.log",
             "hash": "915f7983aee3b903ad5deb4397d8a2cd"
@@ -29,6 +24,11 @@
             "date": 1692933100419,
             "name": "logs\\puppeteer-2023-08-25.log",
             "hash": "1fe3e99bc0095dbdf8916a5555c103cc"
+        },
+        {
+            "date": 1693307932627,
+            "name": "logs\\puppeteer-2023-08-29.log",
+            "hash": "3938c85bfb1794e5e855086da8a23d0b"
         }
     ]
 }

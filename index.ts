@@ -20,9 +20,9 @@ async function launch(){
 
      // list용 실행
      category['categoryNameList'] = ["DNS", "ТВ и мультимедиа", "Телевизоры и аксессуары" ,"Телевизоры"]
-     category['categoryUrl'] = "https://www.datart.cz/vyhledavani?q=oled"
+     category['categoryUrl'] = "https://www.datart.cz/vyhledavani/filter/x:lb.parametricFilter.brand:LG?q=lg&"
      category['categoryNameList'] = category['categoryNameList'].join( " > ")
-     const item = await new DatartKeywordList(chromeConfig,'dynamic.datart.cz').getItemUrls(category)
+     const item = await new DatartLGKeywordList(chromeConfig,'dynamic.datart.cz').getItemUrls(category)
 
 
     // detail용 실행
