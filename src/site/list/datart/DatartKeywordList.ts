@@ -144,7 +144,7 @@ async function parsingItemList(categoryList: Array<string>, detailPage: any, pag
         let bsCate: ColtBaseUrlCate = new ColtBaseUrlCate();
         let bsRank: ColtBaseUrlRank = new ColtBaseUrlRank();
         let parentDiv: any = detailPage(content);
-        let url: string = parentDiv.find('a.product-box-link-box').attr('href');
+        let url: string = 'https://www.datart.cz' + parentDiv.find('a.product-box-link-box').attr('href');
         let goodsName: string = parentDiv.find('div > a > span > b.jsx-1833870204.copy2.primary.jsx-2889528833.normal').text();
         let thumbnail: string = parentDiv.find('div.jsx-1833870204.jsx-3831830274.pod-head > div > a > picture > img').attr('src');
         // if (validate.isNotUndefinedOrEmpty(thumbnail)) {
@@ -155,34 +155,34 @@ async function parsingItemList(categoryList: Array<string>, detailPage: any, pag
         // const itemNum = match[1];
         // console.log("itemNum : " + itemNum);
 
-        let disPrice: any = parentDiv.find('span.copy10.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$","").replaceAll(".","");
-        let orgPrice: any = "";
-        if (parentDiv.find('span.copy3.septenary.medium.jsx-2889528833.normal').text() !== '') {
-            orgPrice = parentDiv.find('span.copy3.septenary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "").replaceAll(".","");
-        }
-        else if(parentDiv.find('span.copy3.primary.medium.jsx-2889528833.normal').text() !== ''){
-            orgPrice = parentDiv.find('span.copy3.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "").replaceAll(".","");
-        }
-        else{
-            orgPrice = parentDiv.find('span.copy10.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "").replaceAll(".","");
-        }
-        if (Object.is(orgPrice, NaN)) orgPrice = '';
-        if (Object.is(disPrice, NaN)) disPrice = '';
+        // let disPrice: any = parentDiv.find('span.copy10.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$","").replaceAll(".","");
+        // let orgPrice: any = "";
+        // if (parentDiv.find('span.copy3.septenary.medium.jsx-2889528833.normal').text() !== '') {
+        //     orgPrice = parentDiv.find('span.copy3.septenary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "").replaceAll(".","");
+        // }
+        // else if(parentDiv.find('span.copy3.primary.medium.jsx-2889528833.normal').text() !== ''){
+        //     orgPrice = parentDiv.find('span.copy3.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "").replaceAll(".","");
+        // }
+        // else{
+        //     orgPrice = parentDiv.find('span.copy10.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$", "").replaceAll(".","");
+        // }
+        // if (Object.is(orgPrice, NaN)) orgPrice = '';
+        // if (Object.is(disPrice, NaN)) disPrice = '';
 
-        let avgPoint: string = parentDiv.find('div.jsx-1833870204.jsx-3831830274.pod-rating.rating-rebranding.pod-rating-4_GRID > div.jsx-1900341405.ratings').attr('data-rating');
-        let totalEvalutCnt: string = parentDiv.find('div.jsx-1833870204.jsx-3831830274.pod-rating.rating-rebranding.pod-rating-4_GRID > span.jsx-2146889120.reviewCount.reviewCount-4_GRID').text().replaceAll("(","").replaceAll(")","");
-        if (totalEvalutCnt.includes('k')) {
-            totalEvalutCnt = totalEvalutCnt.replaceAll(/\D+/gm, '');
-            totalEvalutCnt = totalEvalutCnt + '000';
-        } else if (totalEvalutCnt.includes('нет отзывов')) {
-            totalEvalutCnt = totalEvalutCnt.replaceAll(/\D+/gm, '0');
-        }
+        // let avgPoint: string = parentDiv.find('div.jsx-1833870204.jsx-3831830274.pod-rating.rating-rebranding.pod-rating-4_GRID > div.jsx-1900341405.ratings').attr('data-rating');
+        // let totalEvalutCnt: string = parentDiv.find('div.jsx-1833870204.jsx-3831830274.pod-rating.rating-rebranding.pod-rating-4_GRID > span.jsx-2146889120.reviewCount.reviewCount-4_GRID').text().replaceAll("(","").replaceAll(")","");
+        // if (totalEvalutCnt.includes('k')) {
+        //     totalEvalutCnt = totalEvalutCnt.replaceAll(/\D+/gm, '');
+        //     totalEvalutCnt = totalEvalutCnt + '000';
+        // } else if (totalEvalutCnt.includes('нет отзывов')) {
+        //     totalEvalutCnt = totalEvalutCnt.replaceAll(/\D+/gm, '0');
+        // }
 
         makeItem.makeColtBaseUrlItem(bsItem, url, COLLECT_SITE, itemNum)
         makeItem.makeColtBaseCateItem(bsCate, categoryList)
         makeItem.makeColtBaseRankItem(bsRank, rank)
-        makeItem.makeColtShelfItem(bsItem, url, COLLECT_SITE, SITE_NAME, goodsName, orgPrice, disPrice, totalEvalutCnt,
-            avgPoint, thumbnail, '')
+        //makeItem.makeColtShelfItem(bsItem, url, COLLECT_SITE, SITE_NAME, goodsName, orgPrice, disPrice, totalEvalutCnt,
+        //    avgPoint, thumbnail, '')
 
         bsItem.coltBaseUrlCateList.push(bsCate)
         bsItem.coltBaseUrlRank = bsRank;
