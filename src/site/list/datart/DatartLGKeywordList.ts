@@ -150,10 +150,7 @@ async function parsingItemList(categoryList: Array<string>, detailPage: any, pag
         // if (validate.isNotUndefinedOrEmpty(thumbnail)) {
         //     thumbnail = '';
         // }
-        let itemNum = '';
-        // const match = htmlString.match(regex); // 정규식 매칭
-        // const itemNum = match[1];
-        // console.log("itemNum : " + itemNum);
+        let itemNum: number = parentDiv.find('div > div > div > div > div > div > button.btn.btn-link.btn-compare').attr('id').replaceAll(/[^0-9]/g, '');
 
         // let disPrice: any = parentDiv.find('span.copy10.primary.medium.jsx-2889528833.normal').text().replaceAll(/\s+/gm, "").replaceAll("$","").replaceAll(".","");
         // let orgPrice: any = "";
